@@ -4,7 +4,7 @@ import { FC } from "react";
 const Page: FC = () => {
   return (
     <PageContent>
-      <div></div>;
+      <div></div>
     </PageContent>
   );
 };
