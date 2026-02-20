@@ -24,14 +24,13 @@ export const TemperatureChart: FC<Props> = ({
   // Get legend keys (exclude "Time(s)")
   const legendKeys = useMemo(() => {
     if (!dataPoints.length) return [];
-
-    return Object.keys(dataPoints[0]).filter((key) => key !== "Time(s)");
+    const keys = Object.keys(dataPoints[0]).filter((key) => key !== "Time(s)");
+    return [...keys];
   }, [dataPoints]);
   // Build series dynamically
   const series: SeriesOption[] = useMemo(() => {
     return legendKeys.map((key) => ({
       name: key,
-
       type: "line",
       data: dataPoints.map((point) => point[key as keyof TemperaturePoint]),
     }));
@@ -43,8 +42,26 @@ export const TemperatureChart: FC<Props> = ({
       right: 100,
       bottom: 100,
     },
+    graphic: {
+      elements: [
+        {
+          type: "text",
+          right: 20,
+          top: 20,
+          style: {
+            text: "Reflow",
+            fill: "#333",
+            font: "14px sans-serif",
+          },
+          
+          onclick: () => {
+            console.log("Reflow Click");
+          },
+        },
+      ],
+    },
     legend: {
-      data: legendKeys,
+      data: [...legendKeys, "reflow", "preheat"],
     },
     title: {
       text: chartTitle,
