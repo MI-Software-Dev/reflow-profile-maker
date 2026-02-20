@@ -1,0 +1,35 @@
+"use client";
+import {
+  FileInputField,
+  FormField,
+  SelectFormField,
+} from "@/client/components/atoms";
+import { PageContent } from "@/client/components/atoms/PageContent";
+
+import { FC } from "react";
+import { Measureboard, ProductionInformation } from "./layouts";
+import { observer } from "mobx-react";
+
+const Page: FC = observer(() => {
+  return (
+    <div className="bg-base-100 min-h-screen pt-16">
+      <div className="drawer lg:drawer-open size-full">
+        <input id="my-drawer-1" type="checkbox" className="drawer-toggle hidden" />
+        <div className="drawer-content">
+          <Measureboard />
+        </div>
+        <div className="drawer-side lg:z-0 lg:h-[calc(100vh-4rem)]">
+          <label
+            htmlFor="my-drawer-1"
+            aria-label="close sidebar"
+            className="drawer-overlay"
+          ></label>
+          <div className="flex h-full overflow-y-auto bg-base-100">
+            <ProductionInformation />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+});
+export default Page;
