@@ -4,7 +4,7 @@ import EChartsReact from "echarts-for-react";
 import { EChartsOption, SeriesOption } from "echarts";
 import { TemperaturePoint } from "../../schema";
 import { MeasureResult } from "../../schema/measure-result";
-import { resultMapper } from "./helper";
+import { resultSeries } from "./result-series";
 
 interface Props {
   dataPoints: TemperaturePoint[];
@@ -20,7 +20,7 @@ export const TemperatureChart: FC<Props> = ({
   const timeValue = useMemo(() => {
     return dataPoints.map((point) => point["Time(s)"]);
   }, [dataPoints]);
-  const resultSeries = resultMapper(result);
+  const resultSeriesData = resultSeries(result);
   // Get legend keys (exclude "Time(s)")
   const legendKeys = useMemo(() => {
     if (!dataPoints.length) return [];
@@ -77,10 +77,10 @@ export const TemperatureChart: FC<Props> = ({
     },
     series: [
       ...series,
-      //     ...resultSeries.peakTemp,
       //    ...resultSeries.preheat,
       //   ...resultSeries.rampTimeRate,
-      ...resultSeries.reflow,
+      ...resultSeriesData.peakTemp,
+      ...resultSeriesData.reflow,
     ],
   };
   return (
