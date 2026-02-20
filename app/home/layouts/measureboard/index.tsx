@@ -1,10 +1,7 @@
 import { ArrowRightSquare } from "lucide-react";
 import { observer } from "mobx-react";
-import { FC, useEffect, useMemo, useRef, useState } from "react";
+import { FC } from "react";
 import { homeStore } from "../../store";
-import { EChartsOption, SeriesOption } from "echarts";
-import EChartsReact from "echarts-for-react";
-import { TemperaturePoint } from "../../schema";
 import { TemperatureChart } from "../../components";
 
 export const Measureboard: FC = observer(() => {
