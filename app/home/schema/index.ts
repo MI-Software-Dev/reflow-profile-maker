@@ -3,6 +3,9 @@ export { type RampTimeRateChannelResult } from "./ramp-time-rate-result";
 export { type PeakTempChannelResult } from "./peak-temp-result";
 export { type PreheatTimeResult } from "./preheat-time-result";
 export { formSchema, type FormValues, type FormErrors } from "./form";
-export { type TemperaturePoint,type ChannelName } from "./temperature-point";
-
-
+export { type TemperaturePoint, type ChannelName } from "./temperature-point";
+export { type ReflowTimeSpec } from "./reflow-time-spec";
+export { type PeakTempSpec } from "./peak-temp-spec";
+export { type RampTimeRateSpec } from "./ramp-time-rate-spec";
+export { type PreheatSpec } from "./preheat-spec";
+export { type MeasureResult } from "./measure-result";

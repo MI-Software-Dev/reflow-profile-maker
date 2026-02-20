@@ -1,11 +1,12 @@
 import { ChannelName } from "./temperature-point";
 
-
 export type ReflowTimeChannelResult = {
   [channel in ChannelName]?: {
-    start: number;
-    end: number;
-    value: number;
+    timeStartIdx: number;
+    timeEndIdx: number;
+    timeStart: number;
+    timeEnd: number;
+    diff: number;
     pass: boolean;
   };
 };
