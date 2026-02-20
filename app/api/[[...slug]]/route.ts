@@ -1,36 +1,35 @@
 import { Elysia } from "elysia";
 import { swagger } from "@elysiajs/swagger";
-import { logger } from "@bogeychan/elysia-logger";
 import { V1Route } from "@/server/routes/v1";
 
 const app = new Elysia({ prefix: "/api" })
-//   .use(
-//     logger({
-//       level: "info",
-//       transport: {
-//         target: "pino-pretty",
-//         options: {
-//           colorize: true,
-//           translateTime: "HH:MM:ss",
-//           ignore: "pid,hostname",
-//         },
-//       },
-//     }),
-//   )
+  //   .use(
+  //     logger({
+  //       level: "info",
+  //       transport: {
+  //         target: "pino-pretty",
+  //         options: {
+  //           colorize: true,
+  //           translateTime: "HH:MM:ss",
+  //           ignore: "pid,hostname",
+  //         },
+  //       },
+  //     }),
+  //   )
   .use(
     swagger({
       path: "/openapi",
-      documentation:{
-        info:{
-            title:"Reflow Profile Maker API",
-            version:"2.14.19"
+      documentation: {
+        info: {
+          title: "Reflow Profile Maker API",
+          version: "2.14.19",
         },
-        servers:[
-            {
-                "url":"/reflow-profile-maker"
-            }
-        ]
-      }
+        servers: [
+          {
+            url: "/reflow-profile-maker",
+          },
+        ],
+      },
     }),
   )
   .get("/", () => {
