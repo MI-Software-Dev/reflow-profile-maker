@@ -5,7 +5,7 @@ import { homeStore } from "../../store";
 import { TemperatureChart } from "../../components";
 
 export const Measureboard: FC = observer(() => {
-  const { temperaturePoints, formValues } = homeStore;
+  const { temperaturePoints, formValues, measureReflow } = homeStore;
 
   return (
     <div className="flex size-full flex-col gap-3">
@@ -21,6 +21,12 @@ export const Measureboard: FC = observer(() => {
         <TemperatureChart
           chartTitle={formValues.line}
           dataPoints={temperaturePoints}
+          result={{
+            peakTemp: undefined,
+            preheat: undefined,
+            rampTimeRate: undefined,
+            reflow: measureReflow(),
+          }}
         />
       </div>
     </div>
