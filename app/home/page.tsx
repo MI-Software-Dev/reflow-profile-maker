@@ -14,7 +14,11 @@ const Page: FC = observer(() => {
   return (
     <div className="bg-base-100 min-h-screen pt-16">
       <div className="drawer lg:drawer-open size-full">
-        <input id="my-drawer-1" type="checkbox" className="drawer-toggle hidden" />
+        <input
+          id="my-drawer-1"
+          type="checkbox"
+          className="drawer-toggle hidden"
+        />
         <div className="drawer-content">
           <Measureboard />
         </div>
@@ -24,7 +28,7 @@ const Page: FC = observer(() => {
             aria-label="close sidebar"
             className="drawer-overlay"
           ></label>
-          <div className="flex h-full overflow-y-auto bg-base-100">
+          <div className="bg-base-100 flex h-full overflow-y-auto">
             <ProductionInformation />
           </div>
         </div>
