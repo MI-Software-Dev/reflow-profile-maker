@@ -1,11 +1,13 @@
+"use client";
 import { PageContent } from "@/client/components/atoms";
+import { observer } from "mobx-react";
 import { FC } from "react";
 
-const Page: FC = () => {
+const Page: FC = observer(() => {
   return (
     <PageContent>
-      <div></div>;
+      <></>
     </PageContent>
   );
-};
+});
 export default Page;
