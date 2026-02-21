@@ -1,10 +1,4 @@
 "use client";
-import {
-  FileInputField,
-  FormField,
-  SelectFormField,
-} from "@/client/components/atoms";
-import { PageContent } from "@/client/components/atoms/PageContent";
 
 import { FC } from "react";
 import { Measureboard, ProductionInformation } from "./layouts";
