@@ -1,4 +1,4 @@
-import { FC, useMemo } from "react";
+import { FC, useMemo, useState } from "react";
 
 import EChartsReact from "echarts-for-react";
 import { EChartsOption, SeriesOption } from "echarts";
@@ -10,13 +10,33 @@ interface Props {
   dataPoints: TemperaturePoint[];
   chartTitle: string;
   result: MeasureResult;
+  enableSwitchResult: boolean;
 }
 
 export const TemperatureChart: FC<Props> = ({
   chartTitle = "",
+  enableSwitchResult = false,
   dataPoints,
   result,
 }) => {
+  const [resultSwitch, setResultSwitch] = useState({
+    reflow: {
+      label: "Reflow",
+      value: false,
+    },
+    preheat: {
+      label: "Preheat",
+      value: false,
+    },
+    rampTimeRate: {
+      label: "Ramp Time Rate",
+      value: false,
+    },
+    peakTemp: {
+      label: "Peak Temp",
+      value: false,
+    },
+  });
   const timeValue = useMemo(() => {
     return dataPoints.map((point) => point["Time(s)"]);
   }, [dataPoints]);
@@ -36,32 +56,42 @@ export const TemperatureChart: FC<Props> = ({
     }));
   }, [legendKeys, dataPoints]);
   const option: EChartsOption = {
+    backgroundColor: "#FFF",
     grid: {
       top: 60,
       left: 100,
       right: 100,
       bottom: 100,
     },
-    graphic: {
-      elements: [
-        {
-          type: "text",
-          right: 20,
+    graphic: !enableSwitchResult
+      ? { type: "group" }
+      : {
+          right: 10,
           top: 20,
-          style: {
-            text: "Reflow",
-            fill: "#333",
-            font: "14px sans-serif",
-          },
-          
-          onclick: () => {
-            console.log("Reflow Click");
-          },
+          type: "group",
+          children: Object.entries(resultSwitch).map(([key, item], index) => ({
+            type: "text",
+            left: index * 150, // spacing between items
+            style: {
+              text: item.label,
+              fill: item.value ? "#1890ff" : "#333",
+              font: "18px sans-serif",
+              fontWeight: item.value ? "bold" : "normal",
+              cursor: "pointer",
+            },
+            onclick: () => {
+              setResultSwitch((prev) => ({
+                ...prev,
+                [key]: {
+                  ...prev[key as keyof typeof prev],
+                  value: !prev[key as keyof typeof prev].value,
+                },
+              }));
+            },
+          })),
         },
-      ],
-    },
     legend: {
-      data: [...legendKeys, "reflow", "preheat"],
+      data: legendKeys,
     },
     title: {
       text: chartTitle,
@@ -90,17 +120,21 @@ export const TemperatureChart: FC<Props> = ({
         fontSize: "16",
         fontWeight: "bold",
       },
-      axisLabel: {},
     },
     series: [
       ...series,
-      //    ...resultSeries.preheat,
-      //   ...resultSeries.rampTimeRate,
-      ...resultSeriesData.peakTemp,
-      ...resultSeriesData.reflow,
+      ...(resultSwitch.preheat.value ? resultSeriesData.preheat : []),
+      ...(resultSwitch.rampTimeRate.value ? resultSeriesData.rampTimeRate : []),
+      ...(resultSwitch.peakTemp.value ? resultSeriesData.peakTemp : []),
+      ...(resultSwitch.reflow.value ? resultSeriesData.reflow : []),
     ],
   };
   return (
-    <EChartsReact option={option} style={{ height: "80vh", width: "100%" }} />
+    <EChartsReact
+      notMerge={true}
+      lazyUpdate={false}
+      option={option}
+      style={{ height: "80vh", width: "100%" }}
+    />
   );
 };
