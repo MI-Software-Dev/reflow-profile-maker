@@ -10,7 +10,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/",
-        destination: "/reflow-profile-maker/home",
+        destination: "/reflow-profile-maker",
         permanent: false,
         basePath: false,
       },
