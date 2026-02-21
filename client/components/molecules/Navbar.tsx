@@ -1,6 +1,6 @@
 "use client";
 import { themeStore } from "@/client/providers";
-import { Dot, Hamburger, HamburgerIcon, Menu } from "lucide-react";
+import {  Menu } from "lucide-react";
 import { observer } from "mobx-react";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
