@@ -19,6 +19,7 @@ export const Measureboard: FC = observer(() => {
       </div>
       <div className="flex-1">
         <TemperatureChart
+          enableSwitchResult={false}
           chartTitle={formValues.line}
           dataPoints={temperaturePoints}
           result={{
