@@ -1,6 +1,6 @@
 "use client";
 import { themeStore } from "@/client/providers";
-import {  Menu } from "lucide-react";
+import { Menu } from "lucide-react";
 import { observer } from "mobx-react";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
@@ -54,7 +54,7 @@ export const Navbar: FC = observer(() => {
         </div>
         <ul
           tabIndex={-1}
-          className="dropdown-content menu rounded-box bg-base-100 gap-2 w-52 z-2 p-2 shadow"
+          className="dropdown-content menu rounded-box bg-base-100 z-2 w-52 gap-2 p-2 shadow"
         >
           {route.map((item) => (
             <li key={item.route}>
@@ -73,7 +73,7 @@ export const Navbar: FC = observer(() => {
     );
   };
   return (
-    <div className="navbar bg-base-200 border-base-300 fixed top-0 border-b z-10 shadow">
+    <div className="navbar bg-base-200 border-base-300 fixed top-0 z-10 border-b shadow">
       <div className="navbar-start">
         <div className="flex items-center gap-2">
           <img
