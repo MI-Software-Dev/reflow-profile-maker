@@ -1,9 +1,9 @@
 import { makeAutoObservable } from "mobx";
 
-class KitReflowNumberStore{
+class KitReflowNumberStore {
   constructor() {
-    makeAutoObservable(this)
+    makeAutoObservable(this);
   }
 }
 
-export const kitReflowNumberStore = new KitReflowNumberStore()
+export const kitReflowNumberStore = new KitReflowNumberStore();
