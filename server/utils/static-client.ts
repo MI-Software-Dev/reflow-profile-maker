@@ -11,6 +11,8 @@ const fileMap = {
   line: "line-config.json",
   n2: "n2-config.json",
   nas: "nas-config.json",
+  gateway: "gateway-config.json",
+  db: "db-config.json",
 };
 
 function getFilePath(name: keyof typeof fileMap) {

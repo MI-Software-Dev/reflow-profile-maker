@@ -15,6 +15,12 @@ export const SettingRoute = new Elysia({ prefix: "/setting" })
   .get("/nas", async () => {
     return staticClient.readStatic("nas");
   })
+  .get("/gateway", async () => {
+    return staticClient.readStatic("gateway");
+  })
+  .get("/db", async () => {
+    return staticClient.readStatic("db");
+  })
   .post(
     "/line",
     async ({ body }) => {
@@ -66,14 +72,39 @@ export const SettingRoute = new Elysia({ prefix: "/setting" })
     },
   )
   .post(
+    "/gateway",
+    async ({ body }) => {
+      return staticClient.updateStatic("gateway", body);
+    },
+    {
+      body: t.Object({
+        url: t.String(),
+      }),
+    },
+  )
+  .post(
+    "/db",
+    async ({ body }) => {
+      return staticClient.updateStatic("db", body);
+    },
+    {
+      body: t.Object({
+        host: t.String(),
+        username: t.String(),
+        password: t.String(),
+        port: t.Number(),
+      }),
+    },
+  )
+  .post(
     "/upload-result",
     async ({ body, query }) => {
       const { file } = body;
-      const {isNG} = query
+      const { isNG } = query;
       if (!file) {
         return { error: "No file uploaded" };
       }
-      return UploadResultUseCase(file,isNG);
+      return UploadResultUseCase(file, isNG);
     },
     {
       query: t.Object({
