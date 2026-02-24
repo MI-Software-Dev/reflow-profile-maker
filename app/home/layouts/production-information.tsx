@@ -1,16 +1,21 @@
-import {
-  SelectFormField,
-  FormField,
-  FileInputField,
-} from "@/client/components/atoms";
 import { observer } from "mobx-react";
 import { File } from "lucide-react";
 import { FC } from "react";
 import { homeStore } from "../store";
+import {
+  SelectFormField,
+  FormField,
+  FileInputField,
+} from "@/client/components/molecules";
 
 export const ProductionInformation: FC = observer(() => {
-  const { onChangeFormValue, onMeasure, formValues, onResetFormValues } =
-    homeStore;
+  const {
+    onChangeFormValue,
+    onMeasure,
+    formValues,
+    onResetFormValues,
+    staticForm,
+  } = homeStore;
   const {
     group,
     line,
@@ -33,10 +38,12 @@ export const ProductionInformation: FC = observer(() => {
         name="group"
         placeholder="Select Group"
         value={group}
-        options={[
-          { label: "Group A", value: "A" },
-          { label: "Group B", value: "B" },
-        ]}
+        options={staticForm.group.map((item) => {
+          return {
+            label: `Group ${item}`,
+            value: item,
+          };
+        })}
         onSelect={onChangeFormValue}
       />
       <SelectFormField
@@ -44,10 +51,12 @@ export const ProductionInformation: FC = observer(() => {
         name="line"
         placeholder="Select Line"
         value={line}
-        options={[
-          { label: "Line 1", value: "1" },
-          { label: "Line 2", value: "2" },
-        ]}
+        options={staticForm.line.map((item) => {
+          return {
+            label: item,
+            value: item,
+          };
+        })}
         onSelect={onChangeFormValue}
       />
       <SelectFormField
@@ -55,10 +64,12 @@ export const ProductionInformation: FC = observer(() => {
         name="n2"
         placeholder="Select N2"
         value={n2}
-        options={[
-          { label: "N2 1", value: "1" },
-          { label: "N2 2", value: "2" },
-        ]}
+        options={staticForm.n2.map((item) => {
+          return {
+            label: item,
+            value: item,
+          };
+        })}
         onSelect={onChangeFormValue}
       />
       <SelectFormField
