@@ -1,4 +1,4 @@
-import { PageContent } from "@/client/components/atoms";
+import { PageContent } from "@/client/components/templates";
 import { FC } from "react";
 
 const Page: FC = () => {
