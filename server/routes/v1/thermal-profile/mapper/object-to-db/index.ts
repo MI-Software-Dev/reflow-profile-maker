@@ -1,0 +1,1 @@
+export { makeObjToDBParameter } from "./parameter";
