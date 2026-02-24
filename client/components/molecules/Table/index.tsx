@@ -12,7 +12,7 @@ import { TableColumn, TableProps } from "./type";
 export const Table = <T,>({
   data = [],
   columns = [],
-  itemsPerPage = 10,
+  itemsPerPage: initialItemsPerPage = 10,
   className = "",
   striped = true,
   hoverable = true,
@@ -22,12 +22,15 @@ export const Table = <T,>({
   onRowClick,
 }: TableProps<T>) => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(initialItemsPerPage);
   const [sortConfig, setSortConfig] = useState<{
     key: keyof T;
     direction: "asc" | "desc";
   } | null>(null);
 
-  // Sort data
+  /* =============================
+     Sorting
+  ============================== */
   const sortedData = useMemo(() => {
     if (!sortConfig) return data;
 
@@ -35,77 +38,86 @@ export const Table = <T,>({
       const aValue = a[sortConfig.key];
       const bValue = b[sortConfig.key];
 
-      // Handle null/undefined values
       if (aValue == null && bValue == null) return 0;
       if (aValue == null) return sortConfig.direction === "asc" ? -1 : 1;
       if (bValue == null) return sortConfig.direction === "asc" ? 1 : -1;
 
-      // Convert to strings for comparison if they're not primitive types
       const aStr = String(aValue);
       const bStr = String(bValue);
 
-      if (aStr < bStr) {
-        return sortConfig.direction === "asc" ? -1 : 1;
-      }
-      if (aStr > bStr) {
-        return sortConfig.direction === "asc" ? 1 : -1;
-      }
+      if (aStr < bStr) return sortConfig.direction === "asc" ? -1 : 1;
+      if (aStr > bStr) return sortConfig.direction === "asc" ? 1 : -1;
+
       return 0;
     });
   }, [data, sortConfig]);
 
-  // Pagination calculations
+  /* =============================
+     Pagination (safe clamp)
+  ============================== */
   const totalPages = Math.ceil(sortedData.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
+
+  const safeCurrentPage =
+    totalPages === 0 ? 1 : Math.min(currentPage, totalPages);
+
+  const startIndex = (safeCurrentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
+
   const currentData = sortedData.slice(startIndex, endIndex);
 
-  // Handle sorting
+  const handlePageSizeChange = (value: number) => {
+    setItemsPerPage(value);
+    setCurrentPage(1);
+  };
+
+  /* =============================
+     Sorting handler
+  ============================== */
   const handleSort = (key: keyof T) => {
     const column = columns.find((col) => col.key === key);
     if (!column?.sortable) return;
 
-    setSortConfig((prevConfig) => {
-      if (prevConfig?.key === key) {
+    setSortConfig((prev) => {
+      if (prev?.key === key) {
         return {
           key,
-          direction: prevConfig.direction === "asc" ? "desc" : "asc",
+          direction: prev.direction === "asc" ? "desc" : "asc",
         };
       }
       return { key, direction: "asc" };
     });
   };
 
-  // Pagination handlers
+  /* =============================
+     Pagination handlers
+  ============================== */
   const goToFirstPage = () => setCurrentPage(1);
   const goToLastPage = () => setCurrentPage(totalPages);
   const goToPreviousPage = () =>
     setCurrentPage((prev) => Math.max(prev - 1, 1));
   const goToNextPage = () =>
-    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages || 1));
   const goToPage = (page: number) => setCurrentPage(page);
 
-  // Generate page numbers for pagination
   const getPageNumbers = () => {
-    const pages = [];
+    const pages: number[] = [];
     const maxVisiblePages = 5;
 
     if (totalPages <= maxVisiblePages) {
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i);
-      }
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
     } else {
-      const startPage = Math.max(1, currentPage - 2);
+      const startPage = Math.max(1, safeCurrentPage - 2);
       const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
 
-      for (let i = startPage; i <= endPage; i++) {
-        pages.push(i);
-      }
+      for (let i = startPage; i <= endPage; i++) pages.push(i);
     }
 
     return pages;
   };
 
+  /* =============================
+     Helpers
+  ============================== */
   const renderCellContent = <K extends keyof T>(
     column: TableColumn<T, K>,
     row: T,
@@ -114,7 +126,6 @@ export const Table = <T,>({
     if (column.render) {
       return column.render(row[column.key], row, index);
     }
-
     return row[column.key] as React.ReactNode;
   };
 
@@ -125,52 +136,63 @@ export const Table = <T,>({
     return "";
   };
 
+  /* =============================
+     Loading
+  ============================== */
   if (loading) {
     return (
-      <div className="w-full">
-        <div className="overflow-x-auto">
-          <table
-            className={`table ${striped ? "table-zebra" : ""} ${compact ? "table-compact" : ""} ${className}`}
-          >
-            <thead>
-              <tr>
+      <div className="w-full overflow-x-auto">
+        <table
+          className={`table ${striped ? "table-zebra" : ""} ${
+            compact ? "table-compact" : ""
+          } ${className}`}
+        >
+          <thead>
+            <tr>
+              {columns.map((column) => (
+                <th key={String(column.key)}>
+                  <div className="skeleton h-4 w-20" />
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {Array.from({ length: itemsPerPage }).map((_, i) => (
+              <tr key={i}>
                 {columns.map((column) => (
-                  <th key={String(column.key)} className={column.className}>
-                    <div className="skeleton h-4 w-20"></div>
-                  </th>
+                  <td key={String(column.key)}>
+                    <div className="skeleton h-4 w-full" />
+                  </td>
                 ))}
               </tr>
-            </thead>
-            <tbody>
-              {Array.from({ length: itemsPerPage }).map((_, index) => (
-                <tr key={index}>
-                  {columns.map((column) => (
-                    <td key={String(column.key)} className={column.className}>
-                      <div className="skeleton h-4 w-full"></div>
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
       </div>
     );
   }
 
+  /* =============================
+     Render
+  ============================== */
   return (
     <div className="w-full space-y-4">
-      {/* Table */}
       <div className="overflow-x-auto">
         <table
-          className={`table ${striped ? "table-zebra" : ""} ${hoverable ? "table-hover" : ""} ${compact ? "table-compact" : ""} ${className}`}
+          className={`table ${striped ? "table-zebra" : ""} ${
+            hoverable ? "table-hover" : ""
+          } ${compact ? "table-compact" : ""} ${className}`}
         >
           <thead>
             <tr>
               {columns.map((column) => (
                 <th
                   key={String(column.key)}
-                  className={`${column.className || ""} ${column.sortable ? "hover:bg-base-200 cursor-pointer select-none" : ""}`}
+                  className={`${
+                    column.sortable
+                      ? "hover:bg-base-200 cursor-pointer select-none"
+                      : ""
+                  }`}
                   onClick={() => handleSort(column.key)}
                 >
                   <div className="flex items-center gap-1">
@@ -185,6 +207,7 @@ export const Table = <T,>({
               ))}
             </tr>
           </thead>
+
           <tbody>
             {currentData.length === 0 ? (
               <tr>
@@ -203,7 +226,7 @@ export const Table = <T,>({
                   onClick={() => onRowClick?.(row, startIndex + index)}
                 >
                   {columns.map((column) => (
-                    <td key={String(column.key)} className={column.className}>
+                    <td key={String(column.key)}>
                       {renderCellContent(column, row, startIndex + index)}
                     </td>
                   ))}
@@ -214,57 +237,81 @@ export const Table = <T,>({
         </table>
       </div>
 
-      {/* Pagination */}
-      {totalPages > 1 && (
+      {/* Pagination + Page Size */}
+      {sortedData.length > 0 && (
         <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-          {/* Info */}
-          <div className="text-base-content/70 text-sm">
-            Showing {startIndex + 1} to {Math.min(endIndex, sortedData.length)}{" "}
-            of {sortedData.length} entries
-          </div>
+          {/* Info + Page Size (always visible if data exists) */}
+          <div className="text-base-content/70 flex items-center gap-4 text-sm">
+            <span>
+              Showing {startIndex + 1} to{" "}
+              {Math.min(endIndex, sortedData.length)} of {sortedData.length}{" "}
+              entries
+            </span>
 
-          {/* Pagination Controls */}
-          <div className="join">
-            <button
-              className="join-item btn btn-sm"
-              onClick={goToFirstPage}
-              disabled={currentPage === 1}
-            >
-              <ChevronsLeft size={16} />
-            </button>
-            <button
-              className="join-item btn btn-sm"
-              onClick={goToPreviousPage}
-              disabled={currentPage === 1}
-            >
-              <ChevronLeft size={16} />
-            </button>
-
-            {getPageNumbers().map((pageNumber) => (
-              <button
-                key={pageNumber}
-                className={`join-item btn btn-sm ${currentPage === pageNumber ? "btn-active" : ""}`}
-                onClick={() => goToPage(pageNumber)}
+            <div className="flex items-center gap-2 text-nowrap">
+              <span>Rows per page:</span>
+              <select
+                className="select select-sm select-bordered"
+                value={itemsPerPage}
+                onChange={(e) => handlePageSizeChange(Number(e.target.value))}
               >
-                {pageNumber}
-              </button>
-            ))}
-
-            <button
-              className="join-item btn btn-sm"
-              onClick={goToNextPage}
-              disabled={currentPage === totalPages}
-            >
-              <ChevronRight size={16} />
-            </button>
-            <button
-              className="join-item btn btn-sm"
-              onClick={goToLastPage}
-              disabled={currentPage === totalPages}
-            >
-              <ChevronsRight size={16} />
-            </button>
+                {[5, 10, 20, 50, 100].map((size) => (
+                  <option key={size} value={size}>
+                    {size}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
+
+          {/* Pagination buttons */}
+          {totalPages > 1 && (
+            <div className="join">
+              <button
+                className="join-item btn btn-sm"
+                onClick={goToFirstPage}
+                disabled={safeCurrentPage === 1}
+              >
+                <ChevronsLeft size={16} />
+              </button>
+
+              <button
+                className="join-item btn btn-sm"
+                onClick={goToPreviousPage}
+                disabled={safeCurrentPage === 1}
+              >
+                <ChevronLeft size={16} />
+              </button>
+
+              {getPageNumbers().map((page) => (
+                <button
+                  key={page}
+                  className={`join-item btn btn-sm ${
+                    safeCurrentPage === page ? "btn-active" : ""
+                  }`}
+                  onClick={() => goToPage(page)}
+                >
+                  {page}
+                </button>
+              ))}
+
+              <button
+                className="join-item btn btn-sm"
+                onClick={goToNextPage}
+                disabled={safeCurrentPage === totalPages}
+              >
+                <ChevronRight size={16} />
+              </button>
+
+              <button
+                className="join-item btn btn-sm"
+                onClick={goToLastPage}
+                disabled={safeCurrentPage === totalPages}
+              >
+                <ChevronsRight size={16} />
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
