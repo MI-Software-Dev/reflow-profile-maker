@@ -1,10 +1,14 @@
 "use client";
 
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import { Measureboard, ProductionInformation } from "./layouts";
 import { observer } from "mobx-react";
+import { homeStore } from "./store";
 
 const Page: FC = observer(() => {
+  useEffect(() => {
+    homeStore.init();
+  }, []);
   return (
     <div className="bg-base-100 min-h-screen pt-16">
       <div className="drawer lg:drawer-open size-full">
