@@ -15,8 +15,8 @@ export const Navbar: FC = observer(() => {
       route: "/home",
     },
     {
-      name: "Specs",
-      route: "/specs",
+      name: "Thermal Profile",
+      route: "/thermal-profile",
     },
     {
       name: "Kit Reflow number",
