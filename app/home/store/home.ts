@@ -1,6 +1,7 @@
 import { makeAutoObservable, runInAction } from "mobx";
 import { FormErrors, FormValues, TemperaturePoint } from "../schema";
 import {
+  FetchStaticFormUseCase,
   ReadMemoryTempCsvUseCase,
   ReadMemoryTempTmrUseCase,
 } from "../use-cases";
@@ -19,12 +20,36 @@ class HomeStore {
     specTag: "",
     uploadFile: new File([], ""),
   };
+  staticForm = {
+    line: [] as string[],
+    n2: [] as string[],
+    group: [] as string[],
+  };
   formErrors: FormErrors = {};
   temperaturePoints: TemperaturePoint[] = [];
   measurement = new TemperatureMeasurement();
   constructor() {
     makeAutoObservable(this);
   }
+
+  init = async () => {
+    await this.fetchStaticForm();
+  };
+
+  fetchStaticForm = async () => {
+    const res = await FetchStaticFormUseCase();
+    if (res.success) {
+      runInAction(() => {
+        this.staticForm = res.data;
+      });
+    } else {
+      this.staticForm = {
+        line: [],
+        n2: [],
+        group: [],
+      };
+    }
+  };
 
   measureReflow = () => {
     return this.measurement.measureReflow(this.temperaturePoints, {
@@ -73,11 +98,11 @@ class HomeStore {
         runInAction(() => {
           const fileContent = reader.result;
           if (fileContent && typeof fileContent === "string") {
-            if (file.name.endsWith(".csv")) {
-              this.temperaturePoints = ReadMemoryTempCsvUseCase(fileContent);
-            } else if (file.name.endsWith(".tmr")) {
-              this.temperaturePoints = ReadMemoryTempTmrUseCase(fileContent);
-            }
+            this.temperaturePoints = file.name.endsWith(".csv")
+              ? ReadMemoryTempCsvUseCase(fileContent)
+              : file.name.endsWith(".tmr")
+                ? ReadMemoryTempTmrUseCase(fileContent)
+                : [];
           }
         });
       } catch (e: unknown) {
